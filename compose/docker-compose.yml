@@ -22,7 +22,7 @@ services:
       - DB_URL=mongodb://mongodb:27017
       - TRANSACTOR_URL=ws://transactor:3333;ws://${SERVER_ADDRESS}:3333
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
-      - FRONT_URL=http://front:8080
+      - FRONT_URL=http://front:9195
       - MODEL_ENABLED=*
       - ACCOUNTS_URL=http://${SERVER_ADDRESS}:9194
       - ACCOUNT_PORT=9194
