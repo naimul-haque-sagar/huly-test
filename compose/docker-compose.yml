@@ -20,11 +20,11 @@ services:
       - SERVER_PORT=3000
       - SERVER_SECRET=${HULY_SECRET}
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - TRANSACTOR_URL=ws://transactor:3333;ws://${SERVER_ADDRESS}:3333
+      - TRANSACTOR_URL=ws://transactor:3333;ws://transactor:3333
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - FRONT_URL=http://front:8080
       - MODEL_ENABLED=*
-      - ACCOUNTS_URL=http://${SERVER_ADDRESS}:9194
+      - ACCOUNTS_URL=http://account:9194
       - ACCOUNT_PORT=9194
     restart: unless-stopped
     networks:
@@ -37,7 +37,7 @@ services:
       - SERVER_SECRET=${HULY_SECRET}
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - TRANSACTOR_URL=ws://transactor:3333;ws://${SERVER_ADDRESS}:3333
+      - TRANSACTOR_URL=ws://transactor:3333;ws://transactor:3333
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - MODEL_ENABLED=*
       - ACCOUNTS_URL=http://account:9194
@@ -54,14 +54,14 @@ services:
     environment:
       - SERVER_PORT=8080
       - SERVER_SECRET=${HULY_SECRET}
-      - ACCOUNTS_URL=http://${SERVER_ADDRESS}:9194
-      - REKONI_URL=http://${SERVER_ADDRESS}:4004
       - CALENDAR_URL=http://${SERVER_ADDRESS}:8095
-      - GMAIL_URL=http://${SERVER_ADDRESS}:8088
       - TELEGRAM_URL=http://${SERVER_ADDRESS}:8086
+      - GMAIL_URL=http://${SERVER_ADDRESS}:8088
+      - ACCOUNTS_URL=http://account:9194
+      - REKONI_URL=http://rekoni:4004
       - UPLOAD_URL=/files
       - ELASTIC_URL=http://elasticsearch:9100
-      - COLLABORATOR_URL=ws://${SERVER_ADDRESS}:3078
+      - COLLABORATOR_URL=ws://collaborator:3078
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - TITLE=Huly Self Hosted
@@ -103,7 +103,7 @@ services:
       - METRICS_FILE=metrics.txt
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - REKONI_URL=http://rekoni:4004
-      - FRONT_URL=http://${SERVER_ADDRESS}:9195
+      - FRONT_URL=http://front:9195
       - ACCOUNTS_URL=http://account:9194
       - LAST_NAME_FIRST=true
     restart: unless-stopped
