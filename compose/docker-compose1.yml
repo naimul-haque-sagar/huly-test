@@ -1,16 +1,5 @@
 version: "3"
 services:
-  mongodb:
-    image: "mongo:7-jammy"
-    container_name: mongodb
-    environment:
-      - PUID=1000
-      - PGID=1000
-    volumes:
-      - db:/data/db
-    ports:
-      - 27017:27017
-    restart: unless-stopped
   minio:
     image: "minio/minio"
     command: server /data --address ":9000" --console-address ":9001"
@@ -20,6 +9,9 @@ services:
     volumes:
       - files:/data
     restart: unless-stopped
+    networks:
+      - huly-network
+
   elastic:
     image: "elasticsearch:7.14.2"
     command: |
@@ -41,6 +33,9 @@ services:
       retries: 10
       test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
     restart: unless-stopped
+    networks:
+      - huly-network
+
   account:
     image: hardcoreeng/account:${HULY_VERSION}
     ports:
@@ -48,7 +43,7 @@ services:
     environment:
       - SERVER_PORT=3000
       - SERVER_SECRET=${HULY_SECRET}
-      - DB_URL=mongodb://mongodb:27017
+      - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - TRANSACTOR_URL=ws://transactor:3333;ws://${SERVER_ADDRESS}:3333
       - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
       - FRONT_URL=http://front:8080
@@ -56,18 +51,26 @@ services:
       - ACCOUNTS_URL=http://${SERVER_ADDRESS}:3000
       - ACCOUNT_PORT=3000
     restart: unless-stopped
+    networks:
+      - mongodb-network
+      - huly-network
+
   workspace:
     image: hardcoreeng/workspace:${HULY_VERSION}
     environment:
       - SERVER_SECRET=${HULY_SECRET}
-      - DB_URL=mongodb://mongodb:27017
-      - MONGO_URL=mongodb://mongodb:27017
+      - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
+      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - TRANSACTOR_URL=ws://transactor:3333;ws://${SERVER_ADDRESS}:3333
       - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
       - MODEL_ENABLED=*
       - ACCOUNTS_URL=http://account:3000
       - NOTIFY_INBOX_ONLY=true
     restart: unless-stopped
+    networks:
+      - mongodb-network
+      - huly-network
+
   front:
     image: hardcoreeng/front:${HULY_VERSION}
     ports:
@@ -84,11 +87,15 @@ services:
       - ELASTIC_URL=http://elastic:9100
       - COLLABORATOR_URL=ws://${SERVER_ADDRESS}:3078
       - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
-      - MONGO_URL=mongodb://mongodb:27017
+      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - TITLE=Huly Self Hosted
       - DEFAULT_LANGUAGE=en
       - LAST_NAME_FIRST=true
     restart: unless-stopped
+    networks:
+      - mongodb-network
+      - huly-network
+
   collaborator:
     image: hardcoreeng/collaborator:${HULY_VERSION}
     ports:
@@ -97,9 +104,13 @@ services:
       - COLLABORATOR_PORT=3078
       - SECRET=${HULY_SECRET}
       - ACCOUNTS_URL=http://account:3000
-      - MONGO_URL=mongodb://mongodb:27017
+      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
     restart: unless-stopped
+    networks:
+      - mongodb-network
+      - huly-network
+
   transactor:
     image: hardcoreeng/transactor:${HULY_VERSION}
     ports:
@@ -110,8 +121,8 @@ services:
       - SERVER_CURSOR_MAXTIMEMS=30000
       - ELASTIC_URL=http://elastic:9100
       - ELASTIC_INDEX_NAME=huly_storage_index
-      - DB_URL=mongodb://mongodb:27017
-      - MONGO_URL=mongodb://mongodb:27017
+      - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
+      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - METRICS_CONSOLE=false
       - METRICS_FILE=metrics.txt
       - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
@@ -120,6 +131,10 @@ services:
       - ACCOUNTS_URL=http://account:3000
       - LAST_NAME_FIRST=true
     restart: unless-stopped
+    networks:
+      - mongodb-network
+      - huly-network
+
   rekoni:
     image: hardcoreeng/rekoni-service:${HULY_VERSION}
     ports:
@@ -131,8 +146,16 @@ services:
         limits:
           memory: 500M
     restart: unless-stopped
+    networks:
+      - huly-network
+
+networks:
+  huly-network:
+    external: true
+  mongodb-network:
+    external: true
+
 volumes:
-  db:
   files:
   elastic:
   etcd:
