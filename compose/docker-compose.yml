@@ -1,137 +1,87 @@
-version: "3"
-services:
-  minio:
-    image: "minio/minio"
-    command: server /data --address ":9000" --console-address ":9001"
-    ports:
-      - 9000:9000
-      - 9001:9001
-    volumes:
-      - minio_data:/data
-    restart: unless-stopped
-    networks:
-      - huly-network
-
-  account:
-    image: hardcoreeng/account:${HULY_VERSION}
-    ports:
-      - 9194:3000
-    environment:
-      - SERVER_PORT=3000
-      - SERVER_SECRET=${HULY_SECRET}
-      - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - TRANSACTOR_URL=ws://transactor:3333;ws://transactor:3333
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
-      - FRONT_URL=http://front:8080
-      - MODEL_ENABLED=*
-      - ACCOUNTS_URL=http://account:9194
-      - ACCOUNT_PORT=9194
-    restart: unless-stopped
-    networks:
-      - huly-network
-      - mongodb-network
-
-  workspace:
-    image: hardcoreeng/workspace:${HULY_VERSION}
-    environment:
-      - SERVER_SECRET=${HULY_SECRET}
-      - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - TRANSACTOR_URL=ws://transactor:3333;ws://transactor:3333
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
-      - MODEL_ENABLED=*
-      - ACCOUNTS_URL=http://account:9194
-      - NOTIFY_INBOX_ONLY=true
-    restart: unless-stopped
-    networks:
-      - huly-network
-      - mongodb-network
-
-  front:
-    image: hardcoreeng/front:${HULY_VERSION}
-    ports:
-      - 9195:8080
-    environment:
-      - SERVER_PORT=8080
-      - SERVER_SECRET=${HULY_SECRET}
-      - CALENDAR_URL=http://${SERVER_ADDRESS}:8095
-      - TELEGRAM_URL=http://${SERVER_ADDRESS}:8086
-      - GMAIL_URL=http://${SERVER_ADDRESS}:8088
-      - ACCOUNTS_URL=http://account:9194
-      - REKONI_URL=http://rekoni:4004
-      - UPLOAD_URL=/files
-      - ELASTIC_URL=http://elasticsearch:9100
-      - COLLABORATOR_URL=ws://collaborator:3078
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
-      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - TITLE=Huly Self Hosted
-      - DEFAULT_LANGUAGE=en
-      - LAST_NAME_FIRST=true
-    restart: unless-stopped
-    networks:
-      - huly-network
-      - elasticsearch-network
-
-  collaborator:
-    image: hardcoreeng/collaborator:${HULY_VERSION}
-    ports:
-      - 3078:3078
-    environment:
-      - COLLABORATOR_PORT=3078
-      - SECRET=${HULY_SECRET}
-      - ACCOUNTS_URL=http://account:9194
-      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
-    restart: unless-stopped
-    networks:
-      - huly-network
-      - mongodb-network
-
-  transactor:
-    image: hardcoreeng/transactor:${HULY_VERSION}
-    ports:
-      - 3333:3333
-    environment:
-      - SERVER_PORT=3333
-      - SERVER_SECRET=${HULY_SECRET}
-      - SERVER_CURSOR_MAXTIMEMS=30000
-      - ELASTIC_URL=http://elasticsearch:9100
-      - ELASTIC_INDEX_NAME=huly_storage_index
-      - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - METRICS_CONSOLE=false
-      - METRICS_FILE=metrics.txt
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
-      - REKONI_URL=http://rekoni:4004
-      - FRONT_URL=http://front:9195
-      - ACCOUNTS_URL=http://account:9194
-      - LAST_NAME_FIRST=true
-    restart: unless-stopped
-    networks:
-      - huly-network
-      - elasticsearch-network
-
-  rekoni:
-    image: hardcoreeng/rekoni-service:${HULY_VERSION}
-    ports:
-      - 4004:4004
-    environment:
-      - SECRET=${HULY_SECRET}
-    deploy:
-      resources:
-        limits:
-          memory: 500M
-    restart: unless-stopped
-    networks:
-      - huly-network
-
-volumes:
-  minio_data:
+---
+version: "3.5"
 
 networks:
-  huly-network:
-    external: true
-  mongodb-network:
-    external: true
-  elasticsearch-network:
-    external: true
+  penpot:
+
+volumes:
+  penpot_postgres_v15:
+  penpot_assets:
+
+services:
+  penpot-frontend:
+    image: "penpotapp/frontend:latest"
+    restart: always
+    ports:
+      - ${PORT}:80
+
+    volumes:
+      - penpot_assets:/opt/data/assets
+
+    depends_on:
+      - penpot-backend
+      - penpot-exporter
+
+    networks:
+      - penpot
+
+    environment:
+      - PENPOT_FLAGS=${PENPOT_FLAGS_FE}
+
+  penpot-backend:
+    image: "penpotapp/backend:latest"
+    restart: always
+
+    volumes:
+      - penpot_assets:/opt/data/assets
+
+    depends_on:
+      - penpot-postgres
+      - penpot-redis
+
+    networks:
+      - penpot
+
+    environment:
+      - PENPOT_FLAGS=${PENPOT_FLAGS_BE}
+      - PENPOT_PUBLIC_URI=${PUBLIC_URI}
+      - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
+      - PENPOT_DATABASE_USERNAME=penpot
+      - PENPOT_DATABASE_PASSWORD=penpot
+      - PENPOT_REDIS_URI=redis://penpot-redis/0
+      - PENPOT_ASSETS_STORAGE_BACKEND=assets-fs
+      - PENPOT_STORAGE_ASSETS_FS_DIRECTORY=/opt/data/assets
+      - PENPOT_TELEMETRY_ENABLED=${TELEMETRY_ENABLED}
+
+  penpot-exporter:
+    image: "penpotapp/exporter:latest"
+    restart: always
+    networks:
+      - penpot
+
+    environment:
+      - PENPOT_PUBLIC_URI=http://penpot-frontend
+      - PENPOT_REDIS_URI=redis://penpot-redis/0
+
+  penpot-postgres:
+    image: "postgres:15"
+    restart: always
+    stop_signal: SIGINT
+
+    volumes:
+      - penpot_postgres_v15:/var/lib/postgresql/data
+
+    networks:
+      - penpot
+
+    environment:
+      - POSTGRES_INITDB_ARGS=--data-checksums
+      - POSTGRES_DB=penpot
+      - POSTGRES_USER=penpot
+      - POSTGRES_PASSWORD=penpot
+
+  penpot-redis:
+    image: redis:7
+    restart: always
+    networks:
+      - penpot
