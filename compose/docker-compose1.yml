@@ -28,7 +28,7 @@ services:
     volumes:
       - elastic:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - 9100:9200
     environment:
       - ELASTICSEARCH_PORT_NUMBER=9200
       - BITNAMI_DEBUG=true
@@ -81,7 +81,7 @@ services:
       - GMAIL_URL=http://${SERVER_ADDRESS}:8088
       - TELEGRAM_URL=http://${SERVER_ADDRESS}:8086
       - UPLOAD_URL=/files
-      - ELASTIC_URL=http://elastic:9200
+      - ELASTIC_URL=http://elastic:9100
       - COLLABORATOR_URL=ws://${SERVER_ADDRESS}:3078
       - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
       - MONGO_URL=mongodb://mongodb:27017
@@ -108,7 +108,7 @@ services:
       - SERVER_PORT=3333
       - SERVER_SECRET=${HULY_SECRET}
       - SERVER_CURSOR_MAXTIMEMS=30000
-      - ELASTIC_URL=http://elastic:9200
+      - ELASTIC_URL=http://elastic:9100
       - ELASTIC_INDEX_NAME=huly_storage_index
       - DB_URL=mongodb://mongodb:27017
       - MONGO_URL=mongodb://mongodb:27017
