@@ -139,3 +139,4 @@ networks:
 
 volumes:
   minio_data:
+    external: true
