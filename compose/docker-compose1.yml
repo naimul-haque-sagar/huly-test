@@ -6,9 +6,6 @@ services:
     ports:
       - 9000:9000
       - 9001:9001
-    environment:
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     volumes:
       - minio_data:/data
     restart: unless-stopped
