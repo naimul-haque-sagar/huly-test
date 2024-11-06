@@ -12,30 +12,6 @@ services:
     networks:
       - huly-network
 
-  elastic:
-    image: "elasticsearch:7.14.2"
-    command: |
-      /bin/sh -c "./bin/elasticsearch-plugin list | grep -q ingest-attachment || yes | ./bin/elasticsearch-plugin install --silent ingest-attachment;
-      /usr/local/bin/docker-entrypoint.sh eswrapper"
-    volumes:
-      - elastic:/usr/share/elasticsearch/data
-    ports:
-      - 9100:9200
-    environment:
-      - ELASTICSEARCH_PORT_NUMBER=9200
-      - BITNAMI_DEBUG=true
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
-      - http.cors.enabled=true
-      - http.cors.allow-origin=http://localhost:8082
-    healthcheck:
-      interval: 20s
-      retries: 10
-      test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
-    restart: unless-stopped
-    networks:
-      - huly-network
-
   account:
     image: hardcoreeng/account:${HULY_VERSION}
     ports:
@@ -54,6 +30,7 @@ services:
     networks:
       - mongodb-network
       - huly-network
+      - elasticsearch-network
 
   workspace:
     image: hardcoreeng/workspace:${HULY_VERSION}
@@ -70,6 +47,7 @@ services:
     networks:
       - mongodb-network
       - huly-network
+      - elasticsearch-network
 
   front:
     image: hardcoreeng/front:${HULY_VERSION}
@@ -84,7 +62,7 @@ services:
       - GMAIL_URL=http://${SERVER_ADDRESS}:8088
       - TELEGRAM_URL=http://${SERVER_ADDRESS}:8086
       - UPLOAD_URL=/files
-      - ELASTIC_URL=http://elastic:9100
+      - ELASTIC_URL=http://elasticsearch:9100
       - COLLABORATOR_URL=ws://${SERVER_ADDRESS}:3078
       - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
@@ -95,6 +73,7 @@ services:
     networks:
       - mongodb-network
       - huly-network
+      - elasticsearch-network
 
   collaborator:
     image: hardcoreeng/collaborator:${HULY_VERSION}
@@ -119,7 +98,7 @@ services:
       - SERVER_PORT=3333
       - SERVER_SECRET=${HULY_SECRET}
       - SERVER_CURSOR_MAXTIMEMS=30000
-      - ELASTIC_URL=http://elastic:9100
+      - ELASTIC_URL=http://elasticsearch:9100
       - ELASTIC_INDEX_NAME=huly_storage_index
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
@@ -134,6 +113,7 @@ services:
     networks:
       - mongodb-network
       - huly-network
+      - elasticsearch-network
 
   rekoni:
     image: hardcoreeng/rekoni-service:${HULY_VERSION}
@@ -153,6 +133,8 @@ networks:
   huly-network:
     external: true
   mongodb-network:
+    external: true
+  elasticsearch-network:
     external: true
 
 volumes:
