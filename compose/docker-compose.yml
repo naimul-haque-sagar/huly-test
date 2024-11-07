@@ -1,12 +1,4 @@
----
 version: "3.5"
-
-networks:
-  penpot:
-
-volumes:
-  penpot_postgres_v15:
-  penpot_assets:
 
 services:
   penpot-frontend:
@@ -14,41 +6,34 @@ services:
     restart: always
     ports:
       - ${PORT}:80
-
     volumes:
       - penpot_assets:/opt/data/assets
-
     depends_on:
       - penpot-backend
       - penpot-exporter
-
     networks:
-      - penpot
-
+      - penpot-network
     environment:
       - PENPOT_FLAGS=${PENPOT_FLAGS_FE}
 
   penpot-backend:
     image: "penpotapp/backend:latest"
     restart: always
-
     volumes:
       - penpot_assets:/opt/data/assets
-
     depends_on:
-      - penpot-postgres
-      - penpot-redis
-
+      - penpot-exporter
     networks:
-      - penpot
-
+      - penpot-network
+      - postgres_network
+      - redis_network
     environment:
       - PENPOT_FLAGS=${PENPOT_FLAGS_BE}
       - PENPOT_PUBLIC_URI=${PUBLIC_URI}
-      - PENPOT_DATABASE_URI=postgresql://penpot-postgres/penpot
-      - PENPOT_DATABASE_USERNAME=penpot
-      - PENPOT_DATABASE_PASSWORD=penpot
-      - PENPOT_REDIS_URI=redis://penpot-redis/0
+      - PENPOT_DATABASE_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+      - PENPOT_DATABASE_USERNAME=${POSTGRES_USER}
+      - PENPOT_DATABASE_PASSWORD=${POSTGRES_PASSWORD}
+      - PENPOT_REDIS_URI=redis://:${REDIS_PASSWORD}@redis:${REDIS_PORT}/0
       - PENPOT_ASSETS_STORAGE_BACKEND=assets-fs
       - PENPOT_STORAGE_ASSETS_FS_DIRECTORY=/opt/data/assets
       - PENPOT_TELEMETRY_ENABLED=${TELEMETRY_ENABLED}
@@ -57,31 +42,20 @@ services:
     image: "penpotapp/exporter:latest"
     restart: always
     networks:
-      - penpot
-
+      - penpot-network
+      - redis_network
     environment:
       - PENPOT_PUBLIC_URI=http://penpot-frontend
-      - PENPOT_REDIS_URI=redis://penpot-redis/0
+      - PENPOT_REDIS_URI=redis://:${REDIS_PASSWORD}@redis:${REDIS_PORT}/0
 
-  penpot-postgres:
-    image: "postgres:15"
-    restart: always
-    stop_signal: SIGINT
+networks:
+  penpot-network:
+    external: true
+  postgres_network:
+    external: true
+  redis_network:
+    external: true
 
-    volumes:
-      - penpot_postgres_v15:/var/lib/postgresql/data
-
-    networks:
-      - penpot
-
-    environment:
-      - POSTGRES_INITDB_ARGS=--data-checksums
-      - POSTGRES_DB=penpot
-      - POSTGRES_USER=penpot
-      - POSTGRES_PASSWORD=penpot
-
-  penpot-redis:
-    image: redis:7
-    restart: always
-    networks:
-      - penpot
+volumes:
+  penpot_assets:
+    external: true
