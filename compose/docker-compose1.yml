@@ -30,7 +30,7 @@ services:
     networks:
       - mongodb-network
       - huly-network
-      - elasticsearch-network
+#      - elasticsearch-network
 
   workspace:
     image: hardcoreeng/workspace:${HULY_VERSION}
@@ -47,7 +47,7 @@ services:
     networks:
       - mongodb-network
       - huly-network
-      - elasticsearch-network
+#      - elasticsearch-network
 
   front:
     image: hardcoreeng/front:${HULY_VERSION}
@@ -62,7 +62,7 @@ services:
       - GMAIL_URL=http://${SERVER_ADDRESS}:8088
       - TELEGRAM_URL=http://${SERVER_ADDRESS}:8086
       - UPLOAD_URL=/files
-      - ELASTIC_URL=http://elasticsearch:9100
+      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@elasticsearch:9100
       - COLLABORATOR_URL=ws://${SERVER_ADDRESS}:3078
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
@@ -98,7 +98,7 @@ services:
       - SERVER_PORT=3333
       - SERVER_SECRET=${HULY_SECRET}
       - SERVER_CURSOR_MAXTIMEMS=30000
-      - ELASTIC_URL=http://elasticsearch:9100
+      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@elasticsearch:9100
       - ELASTIC_INDEX_NAME=huly_storage_index
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
