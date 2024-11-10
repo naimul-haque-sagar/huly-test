@@ -2,10 +2,13 @@ version: "3"
 services:
   minio:
     image: "minio/minio"
-    command: server /data --address ":9194" --console-address ":9001"
+    command: server /data --address ":9000" --console-address ":9001"
     ports:
-      - 9194:9194
+      - 9000:9000
       - 9001:9001
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
     restart: unless-stopped
@@ -21,7 +24,7 @@ services:
       - SERVER_SECRET=${HULY_SECRET}
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - TRANSACTOR_URL=ws://transactor:9191;ws://${SERVER_ADDRESS}:9191
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
+      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ROOT_USER}&secretKey=${MINIO_ROOT_PASSWORD}
       - FRONT_URL=http://front:9195
       - MODEL_ENABLED=*
       - ACCOUNTS_URL=http://${SERVER_ADDRESS}:9193
@@ -38,7 +41,7 @@ services:
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - TRANSACTOR_URL=ws://transactor:9191;ws://${SERVER_ADDRESS}:9191
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
+      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ROOT_USER}&secretKey=${MINIO_ROOT_PASSWORD}
       - MODEL_ENABLED=*
       - ACCOUNTS_URL=http://account:9193
       - NOTIFY_INBOX_ONLY=true
@@ -60,9 +63,9 @@ services:
       - GMAIL_URL=http://${SERVER_ADDRESS}:8088
       - TELEGRAM_URL=http://${SERVER_ADDRESS}:8086
       - UPLOAD_URL=/files
-      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@elasticsearch:9100
+      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@172.16.234.51:9100
       - COLLABORATOR_URL=ws://${SERVER_ADDRESS}:9192
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
+      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ROOT_USER}&secretKey=${MINIO_ROOT_PASSWORD}
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - TITLE=Huly Self Hosted
       - DEFAULT_LANGUAGE=en
@@ -82,7 +85,7 @@ services:
       - SECRET=${HULY_SECRET}
       - ACCOUNTS_URL=http://account:9193
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
+      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ROOT_USER}&secretKey=${MINIO_ROOT_PASSWORD}
     restart: unless-stopped
     networks:
       - mongodb-network
@@ -96,13 +99,13 @@ services:
       - SERVER_PORT=9191
       - SERVER_SECRET=${HULY_SECRET}
       - SERVER_CURSOR_MAXTIMEMS=30000
-      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@elasticsearch:9100
+      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@172.16.234.51:9100
       - ELASTIC_INDEX_NAME=huly_storage_index
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
       - METRICS_CONSOLE=false
       - METRICS_FILE=metrics.txt
-      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
+      - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ROOT_USER}&secretKey=${MINIO_ROOT_PASSWORD}
       - REKONI_URL=http://rekoni:9190
       - FRONT_URL=http://${SERVER_ADDRESS}:9195
       - ACCOUNTS_URL=http://account:9193
