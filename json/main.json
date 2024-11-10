@@ -108,16 +108,6 @@
           "default": ""
         },
         {
-          "name": "MINIO_ACCESS_KEY",
-          "label": "MINIO_ACCESS_KEY",
-          "default": ""
-        },
-        {
-          "name": "MINIO_SECRET_KEY",
-          "label": "MINIO_SECRET_KEY",
-          "default": ""
-        },
-        {
           "name": "MINIO_ROOT_USER",
           "label": "MINIO_ROOT_USER",
           "default": ""
