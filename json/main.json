@@ -116,6 +116,21 @@
           "name": "MINIO_SECRET_KEY",
           "label": "MINIO_SECRET_KEY",
           "default": ""
+        },
+        {
+          "name": "MINIO_ROOT_USER",
+          "label": "MINIO_ROOT_USER",
+          "default": ""
+        },
+        {
+          "name": "MINIO_ROOT_PASSWORD",
+          "label": "MINIO_ROOT_PASSWORD",
+          "default": ""
+        },
+        {
+          "name": "ELASTIC_SEARCH_PASSWORD",
+          "label": "ELASTIC_SEARCH_PASSWORD",
+          "default": ""
         }
       ]
     },
@@ -165,6 +180,17 @@
           "name": "http.cors.enabled",
           "description": "Enable CORS",
           "default": "true"
+        },
+        {
+          "label": "xpack.security.enabled",
+          "name": "xpack.security.enabled",
+          "value": "true",
+          "default": "true"
+        },
+        {
+          "label": "ELASTIC_PASSWORD",
+          "name": "ELASTIC_PASSWORD",
+          "value": ""
         }
       ],
       "healthcheck": {
