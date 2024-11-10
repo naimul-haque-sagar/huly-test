@@ -63,7 +63,7 @@ services:
       - GMAIL_URL=http://${SERVER_ADDRESS}:8088
       - TELEGRAM_URL=http://${SERVER_ADDRESS}:8086
       - UPLOAD_URL=/files
-      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@172.16.234.51:9100
+      - ELASTIC_URL=http://elastic:${ELASTIC_SEARCH_PASSWORD}@172.16.234.51:9100 # to do: need to change static ip to container name
       - COLLABORATOR_URL=ws://${SERVER_ADDRESS}:9192
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ROOT_USER}&secretKey=${MINIO_ROOT_PASSWORD}
       - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
