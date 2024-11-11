@@ -2,6 +2,7 @@ version: "3"
 services:
   minio:
     image: "minio/minio"
+    container_name: huly-minio
     command: server /data --address ":9000" --console-address ":9001"
     ports:
       - 9000:9000
@@ -17,6 +18,7 @@ services:
 
   account:
     image: hardcoreeng/account:${HULY_VERSION}
+    container_name: huly-account
     ports:
       - 9193:9193
     environment:
@@ -36,6 +38,7 @@ services:
 
   workspace:
     image: hardcoreeng/workspace:${HULY_VERSION}
+    container_name: huly-workspace
     environment:
       - SERVER_SECRET=${HULY_SECRET}
       - DB_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017
@@ -52,6 +55,7 @@ services:
 
   front:
     image: hardcoreeng/front:${HULY_VERSION}
+    container_name: huly-frontend
     ports:
       - 9195:9195
     environment:
@@ -78,6 +82,7 @@ services:
 
   collaborator:
     image: hardcoreeng/collaborator:${HULY_VERSION}
+    container_name: huly-collaborator
     ports:
       - 9192:9192
     environment:
@@ -93,6 +98,7 @@ services:
 
   transactor:
     image: hardcoreeng/transactor:${HULY_VERSION}
+    container_name: huly-transactor
     ports:
       - 9191:9191
     environment:
@@ -118,6 +124,7 @@ services:
 
   rekoni:
     image: hardcoreeng/rekoni-service:${HULY_VERSION}
+    container_name: huly-rekoni
     ports:
       - 9190:9190
     environment:
