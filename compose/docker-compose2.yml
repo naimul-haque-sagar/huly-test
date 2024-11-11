@@ -6,7 +6,7 @@ services:
     container_name: nextcloud
     restart: unless-stopped
     networks:
-      - cloud
+      - nextcloud
     depends_on:
       - nextclouddb
       - redis
@@ -21,21 +21,18 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Dhaka
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - MYSQL_PASSWORD=dbpassword
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_HOST=nextclouddb
       - REDIS_HOST=redis
-      # - OVERWRITEHOST=cloud.squarehealth.com.bd
-      # - OVERWRITEPROTOCOL=https
-      # - NEXTCLOUD_TRUSTED_DOMAINS=202.59.140.135
 
   cron:
     image: nextcloud
     container_name: nextcloud-cron
     restart: unless-stopped
     networks:
-      - cloud
+      - nextcloud
     depends_on:
       - nextcloud
       - nextclouddb
@@ -57,7 +54,7 @@ services:
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     networks:
-      - cloud
+      - nextcloud
     volumes:
       - ./nextclouddb:/var/lib/mysql
     environment:
@@ -65,24 +62,23 @@ services:
       - PGID=1000
       - TZ=Asia/Dhaka
       - MYSQL_RANDOM_ROOT_PASSWORD=true
-      - MYSQL_PASSWORD=dbpassword
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
 
   collabora:
     image: collabora/code
     container_name: collabora
     restart: unless-stopped
     networks:
-      - cloud
+      - nextcloud
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Dhaka
-      - password=password
-      - username=nextcloud
-      - domain=cloud.squarehealth.com.bd|202.59.140.135
-      #- extra_params=--o:ssl.enable=true
+      - password=${COLLABORA_PASSWORD}
+      - username=${COLLABORA_USERNAME}
+      - domain=${PUBLIC_URL}
       - extra_params=--o:ssl.enable=false --o:ssl.termination=true
     volumes:
       - /usr/share/fonts/truetype:/opt/collaboraoffice/share/fonts/truetype/local:ro
@@ -96,9 +92,9 @@ services:
     volumes:
       - ./redis:/data
     networks:
-      - cloud
+      - nextcloud
 
 networks:
-  cloud:
-    name: cloud
+  nextcloud:
     driver: bridge
+    external: true
