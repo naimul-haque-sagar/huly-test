@@ -3,8 +3,8 @@
   "templates": [
     {
       "type": 3,
-      "title": "Penpot",
       "name": "penpot",
+      "title": "Penpot",
       "categories": [
         "Graphicdesign"
       ],
@@ -35,7 +35,7 @@
         {
           "label": "Public URI",
           "name": "PUBLIC_URI",
-          "default": "http://192.168.1.1:9195",
+          "default": "http://172.16.234.51:9194",
           "description": "Public URI. If you are going to expose this instance to the internet and use it under different domain than 'localhost', you will need to adjust it to the final domain."
         },
         {
@@ -55,10 +55,25 @@
           "description": "When enabled, a periodical process will send anonymous data about this instance."
         },
         {
-          "default": "9195",
+          "default": "9194",
           "label": "Http Port",
           "name": "PORT",
           "description": "This should match the port specified in the Public URI, or 80/443 if using standard ports."
+        },
+        {
+          "label": "POSTGRES_USER",
+          "name": "POSTGRES_USER",
+          "default": ""
+        },
+        {
+          "label": "POSTGRES_PASSWORD",
+          "name": "POSTGRES_PASSWORD",
+          "default": ""
+        },
+        {
+          "label": "POSTGRES_DB",
+          "name": "POSTGRES_DB",
+          "default": ""
         }
       ],
       "platform": "linux",
@@ -138,7 +153,7 @@
       },
       "command": "/bin/sh -c \"./bin/elasticsearch-plugin list | grep -q ingest-attachment || yes | ./bin/elasticsearch-plugin install --silent ingest-attachment; /usr/local/bin/docker-entrypoint.sh eswrapper\"",
       "ports": [
-        "9100:9200/tcp",
+        "9200:9200/tcp",
         "9300:9300/tcp"
       ],
       "volumes": [
@@ -284,6 +299,7 @@
     },
     {
       "type": 1,
+      "name": "postgres",
       "title": "PostgreSQL",
       "description": "Relational database system with a focus on extensibility and SQL compliance.",
       "note": "Launch PostgreSQL with a root user. Additional users and databases can be added later.",
