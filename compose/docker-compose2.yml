@@ -12,12 +12,12 @@ services:
       - nextclouddb
       #- redis
     ports:
-      - 8080:80
+      - 8081:80
     volumes:
-      - /portainer/Files/AppData/Config/nex/Nextcloud/html:/var/www/html
-      - /portainer/Files/AppData/Config/nex/Nextcloud/custom_apps:/var/www/html/custom_apps
-      - /portainer/Files/AppData/Config/nex/Nextcloud/config:/var/www/html/config
-      - /portainer/Files/AppData/Config/nex/Nextcloud/data:/var/www/html/data
+      - /portainer/Files/AppData/Config/Nextcloud/html:/var/www/html
+      - /portainer/Files/AppData/Config/Nextcloud/custom_apps:/var/www/html/custom_apps
+      - /portainer/Files/AppData/Config/Nextcloud/config:/var/www/html/config
+      - /portainer/Files/AppData/Config/Nextcloud/data:/var/www/html/data
     environment:
       - PUID=1000
       - PGID=1000
@@ -41,10 +41,10 @@ services:
       #- redis
     entrypoint: /cron.sh
     volumes:
-      - /portainer/Files/AppData/Config/nex/Nextcloud/html:/var/www/html
-      - /portainer/Files/AppData/Config/nex/Nextcloud/custom_apps:/var/www/html/custom_apps
-      - /portainer/Files/AppData/Config/nex/Nextcloud/config:/var/www/html/config
-      - /portainer/Files/AppData/Config/nex/Nextcloud/data:/var/www/html/data
+      - /portainer/Files/AppData/Config/Nextcloud/html:/var/www/html
+      - /portainer/Files/AppData/Config/Nextcloud/custom_apps:/var/www/html/custom_apps
+      - /portainer/Files/AppData/Config/Nextcloud/config:/var/www/html/config
+      - /portainer/Files/AppData/Config/Nextcloud/data:/var/www/html/data
     environment:
       - PUID=1000
       - PGID=1000
@@ -58,7 +58,7 @@ services:
     networks:
       - nextcloud
     volumes:
-      - /portainer/Files/AppData/Config/nex/Nextcloud/nextclouddb:/var/lib/mysql
+      - /portainer/Files/AppData/Config/Nextcloud/nextclouddb:/var/lib/mysql
     environment:
       - PUID=1000
       - PGID=1000
@@ -86,7 +86,7 @@ services:
     volumes:
       - /usr/share/fonts/truetype:/opt/collaboraoffice/share/fonts/truetype/local:ro
     ports:
-      - 9979:9980
+      - 9980:9980
 
 networks:
   nextcloud:
