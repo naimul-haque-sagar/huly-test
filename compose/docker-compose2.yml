@@ -10,7 +10,7 @@ services:
       - redis_network
     depends_on:
       - nextclouddb
-      - redis
+      #- redis
     ports:
       - 8081:80
     volumes:
@@ -38,7 +38,7 @@ services:
     depends_on:
       - nextcloud
       - nextclouddb
-      - redis
+      #- redis
     entrypoint: /cron.sh
     volumes:
       - /portainer/Files/AppData/Config/Nextcloud/html:/var/www/html
