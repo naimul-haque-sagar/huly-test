@@ -10,14 +10,13 @@ services:
       - redis_network
     depends_on:
       - nextclouddb
-      #- redis
     ports:
-      - 9194:80
+      - 8081:80
     volumes:
-      - /portainer/Files/AppData/Config/Nextcloud/html:/var/www/html
-      - /portainer/Files/AppData/Config/Nextcloud/custom_apps:/var/www/html/custom_apps
-      - /portainer/Files/AppData/Config/Nextcloud/config:/var/www/html/config
-      - /portainer/Files/AppData/Config/Nextcloud/data:/var/www/html/data
+      - ./html:/var/www/html
+      - ./custom_apps:/var/www/html/custom_apps
+      - ./config:/var/www/html/config
+      - ./data:/var/www/html/data
     environment:
       - PUID=1000
       - PGID=1000
@@ -38,13 +37,12 @@ services:
     depends_on:
       - nextcloud
       - nextclouddb
-      #- redis
     entrypoint: /cron.sh
     volumes:
-      - /portainer/Files/AppData/Config/Nextcloud/html:/var/www/html
-      - /portainer/Files/AppData/Config/Nextcloud/custom_apps:/var/www/html/custom_apps
-      - /portainer/Files/AppData/Config/Nextcloud/config:/var/www/html/config
-      - /portainer/Files/AppData/Config/Nextcloud/data:/var/www/html/data
+      - ./html:/var/www/html
+      - ./custom_apps:/var/www/html/custom_apps
+      - ./config:/var/www/html/config
+      - ./data:/var/www/html/data
     environment:
       - PUID=1000
       - PGID=1000
@@ -58,7 +56,7 @@ services:
     networks:
       - nextcloud
     volumes:
-      - /portainer/Files/AppData/Config/Nextcloud/nextclouddb:/var/lib/mysql
+      - ./nextclouddb:/var/lib/mysql
     environment:
       - PUID=1000
       - PGID=1000
