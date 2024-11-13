@@ -37,6 +37,8 @@ services:
     depends_on:
       - nextcloud
       - nextclouddb
+    ports:
+      - 81:80
     entrypoint: /cron.sh
     volumes:
       - ./html:/var/www/html
@@ -55,6 +57,8 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     networks:
       - nextcloud
+    ports:
+      - 3307:3306
     volumes:
       - ./nextclouddb:/var/lib/mysql
     environment:
