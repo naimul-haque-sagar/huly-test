@@ -12,7 +12,7 @@ services:
       - nextclouddb
       #- redis
     ports:
-      - 8081:80
+      - 9194:80
     volumes:
       - /portainer/Files/AppData/Config/Nextcloud/html:/var/www/html
       - /portainer/Files/AppData/Config/Nextcloud/custom_apps:/var/www/html/custom_apps
