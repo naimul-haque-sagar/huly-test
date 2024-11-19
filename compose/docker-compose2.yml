@@ -11,7 +11,7 @@ services:
     depends_on:
       - nextclouddb
     ports:
-      - 8081:80
+      - 9194:80
     volumes:
       - ./html:/var/www/html
       - ./custom_apps:/var/www/html/custom_apps
