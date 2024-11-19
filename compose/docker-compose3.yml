@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+  nextcloud:
+    image: nextcloud:28.0.12
+    container_name: home-nextcloud
+    restart: unless-stopped
+    networks:
+      - home-nextcloud
+      - redis_network
+    depends_on:
+      - nextclouddb
+    ports:
+      - 8081:80
+    volumes:
+      - ./html:/var/www/html
+      - ./custom_apps:/var/www/html/custom_apps
+      - ./config:/var/www/html/config
+      - ./data:/var/www/html/data
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Dhaka
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=nextclouddb
+      - REDIS_HOST=redis
+
+  cron:
+    image: nextcloud
+    container_name: home-nextcloud-cron
+    restart: unless-stopped
+    networks:
+      - home-nextcloud
+      - redis_network
+    depends_on:
+      - nextcloud
+      - nextclouddb
+    ports:
+      - 82:80
+    entrypoint: /cron.sh
+    volumes:
+      - ./html:/var/www/html
+      - ./custom_apps:/var/www/html/custom_apps
+      - ./config:/var/www/html/config
+      - ./data:/var/www/html/data
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Dhaka
+
+  nextclouddb:
+    image: mariadb
+    container_name: home-nextcloud-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    networks:
+      - home-nextcloud
+    ports:
+      - 3308:3306
+    volumes:
+      - ./nextclouddb:/var/lib/mysql
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Dhaka
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+
+  collabora:
+    image: collabora/code
+    container_name: home-collabora
+    restart: unless-stopped
+    networks:
+      - home-nextcloud
+      - redis_network
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Dhaka
+      - password=${COLLABORA_PASSWORD}
+      - username=${COLLABORA_USERNAME}
+      - domain=${PUBLIC_URL}
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true
+    volumes:
+      - /usr/share/fonts/truetype:/opt/collaboraoffice/share/fonts/truetype/local:ro
+    ports:
+      - 9979:9980
+
+networks:
+  home-nextcloud:
+    driver: bridge
+    external: true
+  redis_network:
+    external: true
